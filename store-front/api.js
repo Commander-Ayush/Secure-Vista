@@ -72,4 +72,6 @@ const Api = {
     // POST /reviews  body: { name, rating, text }
     getReviews: () => apiGet("/reviews"),
     submitReview: (payload) => apiPost("/reviews", payload),
+    // GET /booking/availability?year=YYYY&month=MM -> { "YYYY-MM-DD": { status: "avail"|"busy"|"full" }, ... }
+    getAvailability: (year, month) => apiGet(`/booking/availability?year=${year}&month=${month}`),
 };
