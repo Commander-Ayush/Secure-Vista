@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SecureVista — Schedule</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+    <div id="sv-toast" class="sv-toast"></div>
+
+    <div class="admin-shell">
+
+        <!-- ── SIDEBAR ── -->
+        <aside class="admin-sidebar" id="admin-sidebar">
+            <div class="sidebar-brand">
+                <div class="sidebar-brandmark">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f1f5f9" stroke-width="1.7">
+                        <path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z" />
+                    </svg>
+                </div>
+                <div class="sidebar-brandname">
+                    SecureVista
+                    <span>Admin Console</span>
+                </div>
+            </div>
+
+            <nav class="admin-nav">
+                <div class="nav-section-label">Operations</div>
+
+                <a href="dashboard.html">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                        <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                        <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                    Dashboard
+                </a>
+
+                <a href="dashboard.html">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                        <path d="M16 2v4M8 2v4M3 10h18" />
+                    </svg>
+                    Bookings
+                </a>
+
+                <a href="schedule.html" class="active">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <rect x="3" y="4" width="18" height="18" rx="2" />
+                        <path d="M16 2v4M8 2v4M3 10h18" />
+                        <path d="M8 15l2 2 4-4" />
+                    </svg>
+                    Schedule
+                </a>
+
+                <a href="services.html">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M12 2a7 7 0 0 1 7 7c0 4-7 13-7 13S5 13 5 9a7 7 0 0 1 7-7z" />
+                        <circle cx="12" cy="9" r="2.5" />
+                    </svg>
+                    Services &amp; Plans
+                </a>
+
+                <a href="dashboard.html">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                    Reviews
+                </a>
+
+                <div style="flex:1"></div>
+
+                <div class="sidebar-footer">
+                    <button onclick="openChangePassword()" class="nav-link"
+                        style="display:flex;align-items:center;gap:10px;padding:10px 24px;font-size:13.5px;font-weight:500;color:rgba(238,243,238,.5);background:none;border:none;width:100%;cursor:pointer;transition:color .15s">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <rect x="3" y="11" width="18" height="11" rx="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        Change Password
+                    </button>
+                    <button id="logout-btn"
+                        style="display:flex;align-items:center;gap:10px;padding:10px 24px;font-size:13.5px;font-weight:500;color:rgba(238,243,238,.5);background:none;border:none;width:100%;cursor:pointer;transition:color .15s">
+                        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                            <polyline points="16 17 21 12 16 7" />
+                            <line x1="21" y1="12" x2="9" y2="12" />
+                        </svg>
+                        Sign Out
+                    </button>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- ── MAIN ── -->
+        <div class="admin-main">
+
+            <header class="admin-topbar">
+                <div class="topbar-left">
+                    <button class="sidebar-toggle-btn" id="sidebar-toggle" aria-label="Toggle sidebar">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="3" y1="6" x2="21" y2="6" />
+                            <line x1="3" y1="12" x2="21" y2="12" />
+                            <line x1="3" y1="18" x2="21" y2="18" />
+                        </svg>
+                    </button>
+                    <span class="topbar-title">Schedule</span>
+                </div>
+                <div class="topbar-right">
+                    <span class="topbar-date" id="admin-date"></span>
+                    <div class="topbar-avatar">A</div>
+                </div>
+            </header>
+
+            <div class="admin-content">
+
+                <!-- Auto-status rules -->
+                <div class="table-card" style="padding:22px 24px;">
+                    <div class="table-header" style="padding:0 0 16px;border-bottom:none;">
+                        <span class="table-title">Availability Rules</span>
+                        <span style="font-size:12.5px;color:var(--ink-400)">
+                            Set how many bookings in a day should mark it Busy or Full
+                        </span>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="form-field">
+                            <label class="form-checkbox-row">
+                                <input type="checkbox" id="auto-enabled"
+                                    style="width:auto;accent-color:var(--forest-800)" checked />
+                                Auto-calculate day status from bookings
+                            </label>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="busy-threshold">Mark as Busy at</label>
+                            <div class="threshold-input-wrap">
+                                <input type="number" id="busy-threshold" min="1" value="3" />
+                                <span class="threshold-input-suffix">bookings / day</span>
+                            </div>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="full-threshold">Mark as Full at</label>
+                            <div class="threshold-input-wrap">
+                                <input type="number" id="full-threshold" min="1" value="6" />
+                                <span class="threshold-input-suffix">bookings / day</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-save-row">
+                        <button class="btn btn-primary btn-sm" id="save-settings-btn">Save Rules</button>
+                        <span class="settings-save-status" id="settings-save-status"></span>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- Calendar toolbar -->
+                <div class="schedule-toolbar">
+                    <div class="schedule-nav">
+                        <button class="schedule-nav-btn" id="cal-prev" aria-label="Previous">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <polyline points="15 18 9 12 15 6" />
+                            </svg>
+                        </button>
+                        <span class="schedule-range-label" id="cal-range-label">—</span>
+                        <button class="schedule-nav-btn" id="cal-next" aria-label="Next">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                                <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                        </button>
+                        <button class="schedule-today-btn" id="cal-today-btn">Today</button>
+                        <button class="schedule-today-btn" id="select-mode-btn">Select Dates</button>
+                    </div>
+
+                    <div class="schedule-legend">
+                        <span class="sched-legend-dot avail">Available</span>
+                        <span class="sched-legend-dot busy">Busy</span>
+                        <span class="sched-legend-dot full">Full</span>
+                        <span class="sched-legend-dot override">Manually set</span>
+                    </div>
+                </div>
+
+                <!-- Calendar grid: 1 or 2 month panels, populated by JS -->
+                <div class="calendar-row" id="calendar-row">
+                    <div class="cal-loading">Loading schedule…</div>
+                </div>
+
+            </div><!-- /admin-content -->
+        </div><!-- /admin-main -->
+    </div><!-- /admin-shell -->
+
+    <!-- ── DAY STATUS MODAL ── -->
+    <div class="modal-overlay" id="day-status-modal">
+        <div class="modal-box" style="max-width:380px;">
+            <button class="modal-close" onclick="closeDayModal()" aria-label="Close">✕</button>
+            <div class="modal-eyebrow">Day Status</div>
+            <div class="day-modal-date" id="day-modal-date">—</div>
+            <div class="modal-title" style="margin-bottom:10px;" id="day-modal-weekday">—</div>
+
+            <div class="day-modal-count" id="day-modal-count">— bookings scheduled</div>
+
+            <div class="form-field">
+                <label>Status</label>
+                <div class="status-option-row" id="day-status-options">
+                    <div class="status-option opt-auto" data-status="">
+                        <span class="dot"></span> Auto
+                    </div>
+                    <div class="status-option opt-avail" data-status="avail">
+                        <span class="dot"></span> Available
+                    </div>
+                    <div class="status-option opt-busy" data-status="busy">
+                        <span class="dot"></span> Busy
+                    </div>
+                    <div class="status-option opt-full" data-status="full">
+                        <span class="dot"></span> Full
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-ghost btn-sm" onclick="closeDayModal()">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm" id="day-modal-save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/admin-api.js"></script>
+    <script src="js/admin-ui.js"></script>
+    <script src="js/schedule.js"></script>
+
+    <!-- ── BULK SELECTION ACTION BAR ── -->
+    <div class="bulk-action-bar" id="bulk-action-bar">
+        <span class="bulk-count" id="bulk-count">0 selected</span>
+        <div class="bulk-actions">
+            <button class="bulk-btn opt-avail" data-status="avail">Available</button>
+            <button class="bulk-btn opt-busy" data-status="busy">Busy</button>
+            <button class="bulk-btn opt-full" data-status="full">Full</button>
+            <button class="bulk-btn opt-auto" data-status="">Auto</button>
+            <button class="bulk-cancel" id="bulk-cancel-btn">Cancel</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
