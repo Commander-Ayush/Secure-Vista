@@ -743,16 +743,54 @@ document.addEventListener('DOMContentLoaded', () => {
   const isLoginPage = !!document.getElementById('login-form');
   if (!isLoginPage && !getToken()) { goToLogin(); return; }
 
-  /* Mobile sidebar */
+  /* Sidebar toggle: desktop collapse + mobile slide-out */
   const toggle = document.getElementById('sidebar-toggle');
   const sidebar = document.getElementById('admin-sidebar');
-  if (toggle && sidebar) {
-    toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+  const shell = document.querySelector('.admin-shell');
+  let overlay = document.getElementById('sidebar-overlay');
+
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'sidebar-overlay';
+    overlay.className = 'sidebar-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  if (toggle && sidebar && shell) {
+    const syncMobileSidebar = (isOpen) => {
+      sidebar.classList.toggle('open', isOpen);
+      overlay.classList.toggle('open', isOpen);
+    };
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      if (window.innerWidth <= 768) {
+        syncMobileSidebar(!sidebar.classList.contains('open'));
+        shell.classList.remove('sidebar-collapsed');
+      } else {
+        shell.classList.toggle('sidebar-collapsed');
+        sidebar.classList.remove('open');
+        overlay.classList.remove('open');
+      }
+    });
+
+    overlay.addEventListener('click', () => {
+      syncMobileSidebar(false);
+    });
+
     /* Close sidebar when clicking outside on mobile */
     document.addEventListener('click', (e) => {
       if (window.innerWidth <= 768 && sidebar.classList.contains('open')
-        && !sidebar.contains(e.target) && e.target !== toggle) {
-        sidebar.classList.remove('open');
+        && !sidebar.contains(e.target) && e.target !== toggle && e.target !== overlay) {
+        syncMobileSidebar(false);
+      }
+    });
+
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        syncMobileSidebar(false);
+        shell.classList.remove('sidebar-collapsed');
       }
     });
   }

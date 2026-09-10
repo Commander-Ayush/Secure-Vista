@@ -3,7 +3,7 @@
 // ----------------------------------------------------------
 // Talks to the backend through the small AdminScheduleApi
 // wrapper below. Every method first tries a matching function
-// on `window.AdminApi` (admin-api.js) and falls back to
+// on `AdminApi` (admin-api.js) and falls back to
 // realistic in-memory mock data so this page is fully clickable
 // even before the backend endpoints exist.
 //
@@ -22,6 +22,10 @@ const AdminScheduleApi = (function () {
     let mockSettings = { autoEnabled: true, busyThreshold: 3, fullThreshold: 6 };
     const mockOverrides = {}; // dateKey -> manualStatus
 
+    function getBackendApi() {
+        return typeof AdminApi !== 'undefined' ? AdminApi : null;
+    }
+
     function mockBookingCount(dateKey) {
         // Deterministic placeholder so the demo looks plausible —
         // replace entirely once the real endpoint is wired in.
@@ -30,23 +34,26 @@ const AdminScheduleApi = (function () {
     }
 
     function getSettings() {
-        if (window.AdminApi && AdminApi.getScheduleSettings) {
-            return AdminApi.getScheduleSettings();
+        const api = getBackendApi();
+        if (api && typeof api.getScheduleSettings === 'function') {
+            return api.getScheduleSettings();
         }
         return Promise.resolve({ ...mockSettings });
     }
 
     function saveSettings(settings) {
-        if (window.AdminApi && AdminApi.saveScheduleSettings) {
-            return AdminApi.saveScheduleSettings(settings);
+        const api = getBackendApi();
+        if (api && typeof api.saveScheduleSettings === 'function') {
+            return api.saveScheduleSettings(settings);
         }
         mockSettings = { ...settings };
         return Promise.resolve({ ...mockSettings });
     }
 
     function getMonth(year, month) {
-        if (window.AdminApi && AdminApi.getScheduleMonth) {
-            return AdminApi.getScheduleMonth(year, month);
+        const api = getBackendApi();
+        if (api && typeof api.getScheduleMonth === 'function') {
+            return api.getScheduleMonth(year, month);
         }
         const totalDays = new Date(year, month, 0).getDate(); // month is 1-indexed here
         const data = {};
@@ -61,8 +68,9 @@ const AdminScheduleApi = (function () {
     }
 
     function setDayStatus(dateKey, status) {
-        if (window.AdminApi && AdminApi.setDayStatus) {
-            return AdminApi.setDayStatus(dateKey, status);
+        const api = getBackendApi();
+        if (api && typeof api.setDayStatus === 'function') {
+            return api.setDayStatus(dateKey, status);
         }
         if (status) {
             mockOverrides[dateKey] = status;
@@ -73,8 +81,9 @@ const AdminScheduleApi = (function () {
     }
 
     function bulkSetDayStatus(dateKeys, status) {
-        if (window.AdminApi && AdminApi.bulkSetDayStatus) {
-            return AdminApi.bulkSetDayStatus(dateKeys, status);
+        const api = getBackendApi();
+        if (api && typeof api.bulkSetDayStatus === 'function') {
+            return api.bulkSetDayStatus(dateKeys, status);
         }
         // Fallback: no bulk endpoint yet, so apply one at a time.
         return Promise.all(dateKeys.map((d) => setDayStatus(d, status)));

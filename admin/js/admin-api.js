@@ -120,5 +120,4 @@ const AdminApi = {
   // PUT /admin/schedule/days  body: { dates: [...], status }
   // status is null (clear overrides) | "avail" | "busy" | "full"
   bulkSetDayStatus: (dates, status) => authedSend('PUT', '/admin/schedule/days', { dates, status }),
-
 };

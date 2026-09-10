@@ -80,6 +80,45 @@ button {
 .admin-shell {
   display: flex;
   min-height: 100vh;
+  transition: all .28s var(--ease);
+  overflow: hidden;
+}
+
+.admin-shell .admin-sidebar {
+  transition: width .28s var(--ease), min-width .28s var(--ease), max-width .28s var(--ease), opacity .22s var(--ease), transform .28s var(--ease), padding .22s var(--ease);
+}
+
+.admin-shell.sidebar-collapsed .admin-sidebar {
+  width: 0;
+  min-width: 0;
+  max-width: 0;
+  opacity: 0;
+  transform: translateX(-18px);
+  pointer-events: none;
+  overflow: hidden;
+  padding: 0;
+  border: none;
+}
+
+.admin-shell:not(.sidebar-collapsed) .admin-sidebar {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.admin-shell.sidebar-collapsed .sidebar-brand,
+.admin-shell.sidebar-collapsed .admin-nav,
+.admin-shell.sidebar-collapsed .sidebar-footer {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .18s ease, visibility .18s ease;
+}
+
+.admin-shell:not(.sidebar-collapsed) .sidebar-brand,
+.admin-shell:not(.sidebar-collapsed) .admin-nav,
+.admin-shell:not(.sidebar-collapsed) .sidebar-footer {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .18s ease, visibility .18s ease;
 }
 
 /* ── Sidebar ── */
@@ -94,7 +133,7 @@ button {
   height: 100vh;
   overflow-y: auto;
   z-index: 500;
-  transition: transform .25s var(--ease);
+  transition: width .25s var(--ease), transform .25s var(--ease);
 }
 
 .sidebar-brand {
@@ -292,7 +331,9 @@ button {
 }
 
 .sidebar-toggle-btn {
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   cursor: pointer;
@@ -1928,6 +1969,25 @@ td small {
 }
 
 @media (max-width: 768px) {
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    left: 250px;
+    width: calc(100vw - 250px);
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.3);
+    backdrop-filter: blur(2px);
+    z-index: 1999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .25s var(--ease);
+  }
+
+  .sidebar-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   .admin-sidebar {
     position: fixed;
     inset: 0;
@@ -1940,18 +2000,6 @@ td small {
   .admin-sidebar.open {
     transform: translateX(0);
     box-shadow: var(--shadow-lg);
-  }
-
-  /* Overlay cover when menu opens */
-  .admin-sidebar.open::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    left: 250px;
-    background: rgba(15, 23, 42, 0.3);
-    backdrop-filter: blur(2px);
-    width: calc(100vw - 250px);
-    height: 100vh;
   }
 
   .sidebar-toggle-btn {
