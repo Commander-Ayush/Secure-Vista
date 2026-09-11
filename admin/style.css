@@ -81,44 +81,48 @@ button {
   display: flex;
   min-height: 100vh;
   transition: all .28s var(--ease);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .admin-shell .admin-sidebar {
   transition: width .28s var(--ease), min-width .28s var(--ease), max-width .28s var(--ease), opacity .22s var(--ease), transform .28s var(--ease), padding .22s var(--ease);
 }
 
-.admin-shell.sidebar-collapsed .admin-sidebar {
-  width: 0;
-  min-width: 0;
-  max-width: 0;
-  opacity: 0;
-  transform: translateX(-18px);
-  pointer-events: none;
-  overflow: hidden;
-  padding: 0;
-  border: none;
-}
+@media (min-width: 769px) {
+  .admin-shell .admin-sidebar {
+    will-change: width, opacity, transform;
+  }
 
-.admin-shell:not(.sidebar-collapsed) .admin-sidebar {
-  opacity: 1;
-  transform: translateX(0);
-}
+  .admin-shell.sidebar-collapsed .admin-sidebar {
+    width: 0;
+    min-width: 0;
+    max-width: 0;
+    opacity: 0;
+    transform: translateX(-14px);
+    pointer-events: none;
+    overflow: hidden;
+    padding: 0;
+    border: none;
+  }
 
-.admin-shell.sidebar-collapsed .sidebar-brand,
-.admin-shell.sidebar-collapsed .admin-nav,
-.admin-shell.sidebar-collapsed .sidebar-footer {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity .18s ease, visibility .18s ease;
-}
+  .admin-shell:not(.sidebar-collapsed) .admin-sidebar {
+    opacity: 1;
+    transform: translateX(0);
+  }
 
-.admin-shell:not(.sidebar-collapsed) .sidebar-brand,
-.admin-shell:not(.sidebar-collapsed) .admin-nav,
-.admin-shell:not(.sidebar-collapsed) .sidebar-footer {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity .18s ease, visibility .18s ease;
+  .admin-shell.sidebar-collapsed .sidebar-brand,
+  .admin-shell.sidebar-collapsed .admin-nav,
+  .admin-shell.sidebar-collapsed .sidebar-footer {
+    opacity: 0;
+    transition: opacity .18s ease;
+  }
+
+  .admin-shell:not(.sidebar-collapsed) .sidebar-brand,
+  .admin-shell:not(.sidebar-collapsed) .admin-nav,
+  .admin-shell:not(.sidebar-collapsed) .sidebar-footer {
+    opacity: 1;
+    transition: opacity .18s ease;
+  }
 }
 
 /* ── Sidebar ── */

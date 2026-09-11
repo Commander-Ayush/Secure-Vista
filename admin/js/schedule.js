@@ -100,15 +100,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Fallback sidebar toggle / toast, only if admin-ui.js hasn't
-    // already wired these (guarded so nothing double-fires).
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebar = document.getElementById('admin-sidebar');
-    if (sidebarToggle && sidebar && !sidebarToggle.dataset.wired) {
-        sidebarToggle.dataset.wired = 'true';
-        sidebarToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
-    }
-
     if (typeof window.showToast !== 'function') {
         window.showToast = function (message) {
             const toast = document.getElementById('sv-toast');
