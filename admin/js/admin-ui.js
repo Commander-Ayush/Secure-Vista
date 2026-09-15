@@ -187,7 +187,11 @@ function renderBookingsTable(bookings) {
       : `<button class="action-btn confirm" onclick="handleComplete(${req.id})" title="Mark complete">✓ Done</button>`}
         <button class="action-btn delete" onclick="handleDelete(${req.id})" title="Delete">Delete</button>
       </td>
-    </tr>`).join('');
+    </tr>
+    ${req.notes ? `<tr class="booking-note-row" data-note-for="${req.id}">
+      <td></td>
+      <td colspan="7"><div class="booking-note"><strong>Note:</strong> ${escapeHtml(req.notes)}</div></td>
+    </tr>` : ''}`).join('');
 }
 
 async function handleComplete(id) {
