@@ -49,10 +49,18 @@ async function apiPost(path, body) {
 
 const Api = {
     // GET /company  -> { name, city, foundedYear, yardsServed,
-    //                     yearsExperience, phone, email }
-    // Note: the backend's CompanyDto has no street-address field (only
-    // `city`) — the site's street address stays static in the markup.
+    //                     yearsExperience, phone, email, aboutText, address }
+    // aboutText/address populate the About section's paragraph and address
+    // row. Company `name` is deliberately not applied anywhere it would
+    // pop in after load (topbar/logo/footer stay static in the markup) —
+    // see the admin panel's AboutSettingsDto for why.
     getCompany: () => apiGet("/company"),
+
+    // GET /gallery -> [ { id, imageUrl }, ... ]
+    // Backs the "Our Recent Work" gallery section. Falls back to the
+    // markup's static placeholder photos if this returns empty (e.g. a
+    // brand-new tenant that hasn't uploaded anything yet) — see script.js.
+    getGallery: () => apiGet("/gallery"),
 
     // GET /services        -> [ { id, icon, name, description, price, featured, features } , ... ]
     // GET /services/plans   -> same shape, type = "plan"   (unused by SecureVista today)
@@ -72,6 +80,13 @@ const Api = {
     // POST /reviews  body: { name, rating, text }
     getReviews: () => apiGet("/reviews"),
     submitReview: (payload) => apiPost("/reviews", payload),
+
+    // GET /reviews/page?page=0&size=10
+    // -> { content: [...], page, size, totalPages, totalElements, hasNext }
+    // Used by the "Show All" reviews view — pages through reviews 10 at a
+    // time instead of pulling the whole approved-reviews table at once.
+    getReviewsPage: (page = 0, size = 10) => apiGet(`/reviews/page?page=${page}&size=${size}`),
+
     // GET /booking/availability?year=YYYY&month=MM -> { "YYYY-MM-DD": { status: "avail"|"busy"|"full" }, ... }
     getAvailability: (year, month) => apiGet(`/booking/availability?year=${year}&month=${month}`),
 };

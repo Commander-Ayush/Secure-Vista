@@ -97,6 +97,29 @@ const AdminApi = {
   changePassword: (currentPassword, newPassword) =>
     authedSend('POST', '/admin/account/password', { currentPassword, newPassword }),
 
+  // GET /admin/gallery -> [ { id, imageUrl }, ... ]
+  // Backs the storefront's "Our Recent Work" gallery section.
+  // Images themselves are hosted on Cloudinary (see admin-cloudinary.js) —
+  // the backend only ever stores/returns the resulting URL.
+  getGallery: () => authedGet('/admin/gallery'),
+  addGalleryImage: (imageUrl) => authedSend('POST', '/admin/gallery', { imageUrl }),
+  deleteGalleryImage: (id) => authedSend('DELETE', `/admin/gallery/${id}`),
+
+  // GET /admin/about -> { aboutText, phone, email, address }
+  // Backs the storefront's About/Contact section (section-sub paragraph +
+  // the three contact-detail rows). Company name is deliberately NOT
+  // editable here — it renders in the topbar/logo before any API call
+  // resolves, so making it backend-driven would mean it visibly pops
+  // in (or shows stale/blank) on slow connections. It stays a static
+  // value in the storefront markup.
+  // NOTE: this is a superset of the existing public CompanyDto
+  // (/company) — that endpoint has no `address` or `aboutText` field
+  // yet, so the backend will need to extend it (or expose these via
+  // /company too) for edits made here to actually show up on the
+  // storefront.
+  getAboutSettings: () => authedGet('/admin/about'),
+  saveAboutSettings: (payload) => authedSend('PUT', '/admin/about', payload),
+
   // GET /admin/reviews -> [ ReviewDto, ... ] (all: pending + approved)
   getReviews: () => authedGet('/admin/reviews'),
   approveReview: (id) => authedSend('POST', `/admin/reviews/${id}/approve`),

@@ -55,9 +55,20 @@ document.addEventListener("DOMContentLoaded", function () {
                     if (emailEl) emailEl.textContent = company.email;
                 }
 
-                if (company.city || company.foundedYear) {
-                    const aboutSub = document.querySelector(".about-section .section-sub");
-                    if (aboutSub) {
+                if (company.address) {
+                    const addrEl = document.getElementById("contact-address");
+                    if (addrEl) addrEl.textContent = company.address;
+                }
+
+                const aboutSub = document.querySelector(".about-section .section-sub");
+                if (aboutSub) {
+                    if (company.aboutText) {
+                        // Admin-authored copy from the About & Contact page — takes
+                        // priority whenever it's been set.
+                        aboutSub.textContent = company.aboutText;
+                    } else if (company.city || company.foundedYear) {
+                        // No custom copy yet — fall back to a synthesized sentence
+                        // so a brand-new tenant still gets something sensible.
                         const founded = company.foundedYear ? ` since ${company.foundedYear}` : "";
                         const city = company.city ? ` in ${company.city}` : "";
                         aboutSub.textContent = `Providing top-tier low-voltage integration and peace of mind${city}${founded}.`;
@@ -66,6 +77,25 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch((err) => {
                 console.warn("Could not load company info from backend, keeping static content:", err.message);
+            });
+    }
+
+    // 1c. Live gallery photos from the backend.
+    if (typeof Api !== "undefined" && Api.getGallery) {
+        Api.getGallery()
+            .then((photos) => {
+                if (!Array.isArray(photos) || photos.length === 0) return; // keep static placeholders
+                const container = document.querySelector(".gallery-container");
+                if (!container) return;
+                container.innerHTML = photos
+                    .map((p, i) => `
+                        <div class="gallery-card${i === 2 ? " center-card" : ""}">
+                            <img src="${escapeHtml(p.imageUrl)}" alt="Gallery photo">
+                        </div>`)
+                    .join("");
+            })
+            .catch((err) => {
+                console.warn("Could not load gallery from backend, keeping static content:", err.message);
             });
     }
 
@@ -368,46 +398,91 @@ document.addEventListener("DOMContentLoaded", function () {
 
     bootServices();
 
-    // 7. Reviews "Show All" Toggle Logic
+    // 7. Reviews "Show All" Toggle Logic — paginated (10 per page) so a
+    //    business with a large review history doesn't get the whole
+    //    table pulled into the DOM in one request.
     const toggleReviewsBtn = document.getElementById('toggle-reviews-btn');
     const reviewsSummaryLayout = document.getElementById('reviews-summary-layout');
     const reviewsGrid = document.getElementById('reviews-grid');
+    const reviewsPagination = document.getElementById('reviews-pagination');
+    const reviewsNextBtn = document.getElementById('reviews-next-btn');
 
     if (toggleReviewsBtn && reviewsSummaryLayout && reviewsGrid) {
-        const allReviews = [
-            { name: "Alex M.", stars: "★★★★★", text: "Outstanding setup. Installed 8 CCTV cameras around our warehouse with zero downtime." },
-            { name: "Sarah K.", stars: "★★★★★", text: "The access control app is super smooth. Our office team loves not carrying physical keys." },
-            { name: "David P.", stars: "★★★★★", text: "Fast maintenance response time! They fixed our panel issue within 2 hours." },
-            { name: "Elena R.", stars: "★★★★★", text: "Clean cabling and high quality 4K camera streams. Very professional team." },
-            { name: "Marcus T.", stars: "★★★★★", text: "24/7 monitoring gives us total peace of mind for our retail store." }
-        ];
+        const REVIEWS_PAGE_SIZE = 10;
+        let currentReviewsPage = 0;
+        let reviewsLoadedOnce = false;
 
-        allReviews.forEach(rev => {
-            const card = document.createElement('div');
-            card.className = 'review-card';
-            card.innerHTML = `
-                <div class="review-header">
-                    <span class="reviewer-name">${rev.name}</span>
-                    <span class="review-stars">${rev.stars}</span>
-                </div>
-                <p class="review-text">${rev.text}</p>
-            `;
-            reviewsGrid.appendChild(card);
-        });
+        function renderReviewsPage(pageData) {
+            reviewsGrid.innerHTML = '';
+            (pageData.content || []).forEach(rev => {
+                const card = document.createElement('div');
+                card.className = 'review-card';
+                const stars = '★'.repeat(rev.stars || 0) + '☆'.repeat(5 - (rev.stars || 0));
+                card.innerHTML = `
+                    <div class="review-header">
+                        <span class="reviewer-name">${escapeHtml(rev.reviewerName || 'Anonymous')}</span>
+                        <span class="review-stars">${stars}</span>
+                    </div>
+                    <p class="review-text">${escapeHtml(rev.text || '')}</p>
+                `;
+                reviewsGrid.appendChild(card);
+            });
+
+            // Only ever show the single Next Page control, and only when
+            // there's actually another page to fetch.
+            if (reviewsPagination) {
+                reviewsPagination.classList.toggle('hidden', !pageData.hasNext);
+            }
+        }
+
+        async function loadReviewsPage(page) {
+            if (typeof Api === 'undefined' || !Api.getReviewsPage) return;
+            if (reviewsNextBtn) {
+                reviewsNextBtn.disabled = true;
+                reviewsNextBtn.textContent = 'Loading…';
+            }
+            try {
+                const pageData = await Api.getReviewsPage(page, REVIEWS_PAGE_SIZE);
+                currentReviewsPage = pageData.page;
+                renderReviewsPage(pageData);
+            } catch (err) {
+                console.warn('Could not load reviews page:', err.message);
+                if (reviewsGrid.innerHTML === '') {
+                    reviewsGrid.innerHTML = '<p class="review-text">Could not load reviews right now — please try again shortly.</p>';
+                }
+                if (reviewsPagination) reviewsPagination.classList.add('hidden');
+            } finally {
+                if (reviewsNextBtn) {
+                    reviewsNextBtn.disabled = false;
+                    reviewsNextBtn.textContent = 'Next Page';
+                }
+            }
+        }
 
         toggleReviewsBtn.addEventListener('click', () => {
             const isGridVisible = !reviewsGrid.classList.contains('hidden');
 
             if (isGridVisible) {
                 reviewsGrid.classList.add('hidden');
+                if (reviewsPagination) reviewsPagination.classList.add('hidden');
                 reviewsSummaryLayout.classList.remove('hidden');
                 toggleReviewsBtn.textContent = 'Show All';
             } else {
                 reviewsGrid.classList.remove('hidden');
                 reviewsSummaryLayout.classList.add('hidden');
                 toggleReviewsBtn.textContent = 'Show Summary';
+                if (!reviewsLoadedOnce) {
+                    reviewsLoadedOnce = true;
+                    loadReviewsPage(0); // fetch only the first 10 reviews, not the whole table
+                }
             }
         });
+
+        if (reviewsNextBtn) {
+            reviewsNextBtn.addEventListener('click', () => {
+                loadReviewsPage(currentReviewsPage + 1);
+            });
+        }
     }
 
     // 8. Photo Gallery Center Scroll Helper

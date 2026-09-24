@@ -467,6 +467,121 @@ async function submitItemForm(e) {
 }
 
 /* =====================
+   GALLERY PAGE
+   ===================== */
+let _galleryItems = [];
+
+async function loadGallery() {
+  const grid = document.getElementById('gallery-grid');
+  if (!grid) return;
+  try {
+    _galleryItems = await AdminApi.getGallery();
+    renderGallery();
+  } catch (err) {
+    console.error('gallery load failed', err);
+    grid.innerHTML = '<div class="catalog-empty">Could not load the gallery — try refreshing.</div>';
+  }
+}
+
+function renderGallery() {
+  const grid = document.getElementById('gallery-grid');
+  const btn = document.getElementById('gallery-upload-btn');
+  if (btn) btn.disabled = _galleryItems.length >= 5;
+  if (!grid) return;
+  if (!_galleryItems.length) {
+    grid.innerHTML = '<div class="catalog-empty">No photos yet — upload your first one above.</div>';
+    return;
+  }
+  grid.innerHTML = _galleryItems.map(item => `
+    <div class="catalog-card" data-gallery-id="${item.id}">
+      <div class="catalog-card-thumb"><img src="${escapeHtml(item.imageUrl)}" alt="Gallery photo"></div>
+      <div class="catalog-card-actions">
+        <button class="action-btn delete" onclick="handleDeleteGalleryImage(${item.id})">Remove</button>
+      </div>
+    </div>`).join('');
+}
+
+async function handleGalleryFileChosen(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  if (_galleryItems.length >= 5) {
+    alert('Gallery is limited to 5 photos. Remove one before uploading another.');
+    e.target.value = '';
+    return;
+  }
+
+  const btn = document.getElementById('gallery-upload-btn');
+  const label = document.getElementById('gallery-upload-label');
+  const originalLabel = label ? label.textContent : '';
+  if (btn) btn.disabled = true;
+  if (label) label.textContent = 'Uploading…';
+
+  try {
+    const uploadedUrl = await uploadImageToCloudinary(file);
+    await AdminApi.addGalleryImage(uploadedUrl);
+    await loadGallery();
+    showToast('Photo added to the gallery.');
+  } catch (err) {
+    alert(err.message || 'Upload failed — please try again.');
+  } finally {
+    if (btn) btn.disabled = false;
+    if (label) label.textContent = originalLabel || 'Upload Photo';
+    e.target.value = ''; // allow re-selecting the same file later
+  }
+}
+
+async function handleDeleteGalleryImage(id) {
+  if (!confirm('Remove this photo from the storefront gallery?')) return;
+  try {
+    await AdminApi.deleteGalleryImage(id);
+    await loadGallery();
+    showToast('Photo removed.');
+  } catch (err) { alert(err.message); }
+}
+
+/* =====================
+   ABOUT & CONTACT PAGE
+   ===================== */
+async function loadAboutSettings() {
+  try {
+    const settings = await AdminApi.getAboutSettings();
+    document.getElementById('about-text').value = settings.aboutText || '';
+    document.getElementById('about-phone').value = settings.phone || '';
+    document.getElementById('about-email').value = settings.email || '';
+    document.getElementById('about-address').value = settings.address || '';
+  } catch (err) {
+    console.error('about settings load failed', err);
+    showToast('Could not load current details — try refreshing.');
+  }
+}
+
+async function submitAboutForm(e) {
+  e.preventDefault();
+  const btn = document.getElementById('about-save-btn');
+  const status = document.getElementById('about-save-status');
+  const payload = {
+    aboutText: document.getElementById('about-text').value,
+    phone: document.getElementById('about-phone').value,
+    email: document.getElementById('about-email').value,
+    address: document.getElementById('about-address').value,
+  };
+  if (btn) btn.disabled = true;
+  if (status) status.textContent = 'Saving…';
+  try {
+    await AdminApi.saveAboutSettings(payload);
+    if (status) status.textContent = 'Saved.';
+    showToast('About & contact details updated.');
+  } catch (err) {
+    if (status) status.textContent = '';
+    alert(err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (status) setTimeout(() => { if (status) status.textContent = ''; }, 3000);
+  }
+}
+
+/* =====================
    PRODUCTS PAGE (Shop & Products)
    ===================== */
 const PRODUCT_CATEGORY_LABELS = {
@@ -834,6 +949,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('services-grid') && document.getElementById('item-form')) {
     loadServiceCatalog();
     document.getElementById('item-form').addEventListener('submit', submitItemForm);
+  }
+
+  /* Gallery page wiring */
+  if (document.getElementById('gallery-grid')) {
+    loadGallery();
+    const fileInput = document.getElementById('gallery-file-input');
+    if (fileInput) fileInput.addEventListener('change', handleGalleryFileChosen);
+  }
+
+  /* About & Contact page wiring */
+  if (document.getElementById('about-form')) {
+    loadAboutSettings();
+    document.getElementById('about-form').addEventListener('submit', submitAboutForm);
   }
 
   /* Products page wiring */
