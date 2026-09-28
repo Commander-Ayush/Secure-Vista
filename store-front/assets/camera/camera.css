@@ -1,0 +1,49 @@
+/* Scoped camera styling; the storefront's existing sections keep their theme. */
+.hero:has(+ .sv-camera) { min-height: 0; padding-bottom: 2.5rem; }
+.sv-camera { width: min(1100px, 90%); margin: 0 auto clamp(3rem, 7vw, 6rem); border-top: 1px solid var(--border-base); border-bottom: 1px solid var(--border-base); }
+.sv-camera__topline, .sv-camera__bottomline { display: flex; justify-content: space-between; align-items: center; gap: 1.25rem; padding: 1.25rem 0; }
+.sv-camera__topline h2 { margin: 0; text-align: left; font-size: 1.25rem; letter-spacing: -.04em; }
+.sv-camera__eyebrow { color: var(--text-muted); font: 500 .75rem/1.5 var(--font-mono); letter-spacing: .08em; }
+.sv-camera__display { position: relative; isolation: isolate; height: clamp(380px, 44vw, 510px); background: radial-gradient(ellipse at 50% 65%, rgba(220,38,38,.06), transparent 64%); }
+.sv-camera__stage { width: 100%; height: 100%; touch-action: pan-y pinch-zoom; border-radius: 12px; }
+.sv-camera__stage canvas { display: block; width: 100%; height: 100%; }
+.sv-camera__stage:focus-visible, .sv-camera__controls button:focus-visible { outline: 2px solid var(--primary); outline-offset: 5px; }
+.sv-camera__status { position: absolute; top: 45%; left: 5%; right: 5%; text-align: center; color: var(--text-muted); pointer-events: none; }
+.sv-camera__status[hidden] { display: none; }
+.sv-camera__corner { position: absolute; width: 26px; height: 26px; pointer-events: none; border-color: var(--primary); opacity: .55; }
+.sv-camera__corner--tl { top: 16px; left: 16px; border-left: 2px solid; border-top: 2px solid; color: var(--primary); }
+.sv-camera__corner--br { bottom: 16px; right: 16px; border-right: 2px solid; border-bottom: 2px solid; color: var(--primary); }
+.sv-camera__bottomline p { color: var(--text-muted); font-size: .875rem; }
+.sv-camera__controls { display: flex; flex-wrap: wrap; gap: .65rem; }
+.sv-camera__controls button { min-height: 44px; padding: .6rem 1rem; font: 600 .875rem/1.4 var(--font-sans); color: var(--text-main); background: var(--bg-card); border: 1px solid var(--border-base); border-radius: 8px; cursor: pointer; }
+.sv-camera__controls button:hover { border-color: var(--primary); color: var(--primary); }
+.sv-camera__controls button[aria-pressed="true"] { border-color: var(--primary); background: var(--primary-glow); }
+.sv-camera__controls button:disabled { opacity: .5; cursor: default; }
+.sv-camera__sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.sv-camera-credit { margin-top: .75rem; font-size: .75rem; color: var(--text-muted); }
+.sv-camera-credit a { color: inherit; text-underline-offset: 3px; }
+@media (max-width: 768px) {
+    .hero:has(+ .sv-camera) { padding: 112px 1.5rem 2rem; }
+    .sv-camera { width: calc(100% - 2rem); margin-bottom: 3.5rem; }
+    .sv-camera__topline { gap: .75rem; flex-wrap: wrap; padding: 1rem .25rem; }
+    .sv-camera__topline h2 { font-size: 1.125rem; }
+    .sv-camera__eyebrow { font-size: .75rem; letter-spacing: 0; }
+    .sv-camera__display { height: clamp(330px, 95vw, 420px); }
+    .sv-camera__bottomline { flex-direction: column; align-items: center; gap: .9rem; text-align: center; }
+    .sv-camera__controls { justify-content: center; }
+}
+
+/* A square render scales by stage height, exactly like the perspective camera.
+   Container aspect ratio selects the same camera distance as resize() in JS. */
+.sv-camera__stage { position: relative; container-type: size; overflow: hidden; }
+.sv-camera__poster { position: absolute; top: 0; left: 50%; height: 100%; width: auto; max-width: none; transform: translateX(-50%); pointer-events: none; }
+.sv-camera__poster--narrow { display: none; }
+.sv-camera__stage canvas { visibility: hidden; }
+.sv-camera__stage[data-live="true"] canvas { visibility: visible; }
+.sv-camera__stage[data-live="true"] .sv-camera__poster { display: none; }
+@container (aspect-ratio < 1) {
+    .sv-camera__poster--wide { display: none; }
+    .sv-camera__poster--narrow { display: block; }
+    .sv-camera__stage[data-live="true"] .sv-camera__poster--narrow { display: none; }
+}
+.sv-camera__status { top: auto; bottom: 10px; background: rgba(248,250,252,.94); padding: .5rem; border-radius: 8px; }

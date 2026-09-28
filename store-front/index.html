@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SecureVista</title>
     <link rel="stylesheet" href="style2.css">
+    <link rel="stylesheet" href="assets/camera/camera.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -43,6 +44,38 @@
                 <p>Protecting what matters most with smart CCTV, access control, and 24/7 proactive monitoring.</p>
                 <a href="#booking" class="btn">Get a Free Consultation</a>
             </div>
+        </section>
+
+        <!-- Interactive camera: independent of the storefront API. -->
+        <section class="sv-camera" aria-labelledby="sv-camera-title">
+            <div class="sv-camera__topline">
+                <h2 id="sv-camera-title">A closer look.</h2>
+                <span class="sv-camera__eyebrow">SMART SURVEILLANCE / 01</span>
+            </div>
+            <div class="sv-camera__display">
+                <div id="sv-camera-stage" class="sv-camera__stage" role="group" tabindex="0"
+                    aria-label="Interactive CCTV camera" aria-describedby="sv-camera-hint sv-camera-keyboard">
+                    <img class="sv-camera__poster sv-camera__poster--wide" src="assets/camera/camera-poster-wide.webp"
+                        width="1020" height="1020" alt="" aria-hidden="true" fetchpriority="high" decoding="sync">
+                    <img class="sv-camera__poster sv-camera__poster--narrow" src="assets/camera/camera-poster-narrow.webp"
+                        width="1020" height="1020" alt="" aria-hidden="true" fetchpriority="high" decoding="sync">
+                </div>
+                <p id="sv-camera-status" class="sv-camera__status" role="status" hidden>Loading the camera…</p>
+                <noscript>
+                    <p class="sv-camera__status">Enable JavaScript to explore the camera.</p>
+                </noscript>
+                <span class="sv-camera__corner sv-camera__corner--tl" aria-hidden="true"></span>
+                <span class="sv-camera__corner sv-camera__corner--br" aria-hidden="true"></span>
+            </div>
+            <div class="sv-camera__bottomline">
+                <p id="sv-camera-hint">Move your cursor. Find your angle.</p>
+                <div class="sv-camera__controls">
+                    <button type="button" id="sv-camera-centre" disabled>Centre camera</button>
+                    <button type="button" id="sv-camera-pause" aria-pressed="false" disabled>Pause tracking</button>
+                </div>
+            </div>
+            <p id="sv-camera-keyboard" class="sv-camera__sr-only">Use arrow keys to aim the camera. Press Home to centre
+                it.</p>
         </section>
 
         <!-- Services Section -->
@@ -264,7 +297,8 @@
 
             <!-- Grid View for Reviews (Hidden by default) -->
             <div class="reviews-grid-container hidden" id="reviews-grid"></div>
-            <div class="reviews-pagination hidden" id="reviews-pagination" style="text-align:center; margin-top: 1.5rem;">
+            <div class="reviews-pagination hidden" id="reviews-pagination"
+                style="text-align:center; margin-top: 1.5rem;">
                 <button id="reviews-next-btn" class="btn-toggle">Next Page</button>
             </div>
         </section>
@@ -301,11 +335,16 @@
 
     <footer>
         <p>&copy; <span id="footer-year">2026</span> <span id="footer-name">SecureVista</span>. All rights reserved.</p>
+        <p class="sv-camera-credit">3D camera by <a
+                href="https://sketchfab.com/3d-models/cctv-camera-281b2b84260447e49ab4a6b34bf78697" target="_blank"
+                rel="noopener">Just8</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank"
+                rel="noopener">CC BY 4.0</a> · interactive adaptation</p>
     </footer>
 
     <script src="icons.js"></script>
     <script src="api.js"></script>
     <script src="script.js"></script>
+    <script type="module" src="assets/camera/camera.js"></script>
 </body>
 
 </html>
