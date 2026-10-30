@@ -57,8 +57,9 @@
                     aria-label="Interactive CCTV camera" aria-describedby="sv-camera-hint sv-camera-keyboard">
                     <img class="sv-camera__poster sv-camera__poster--wide" src="assets/camera/camera-poster-wide.webp"
                         width="1020" height="1020" alt="" aria-hidden="true" fetchpriority="high" decoding="sync">
-                    <img class="sv-camera__poster sv-camera__poster--narrow" src="assets/camera/camera-poster-narrow.webp"
-                        width="1020" height="1020" alt="" aria-hidden="true" fetchpriority="high" decoding="sync">
+                    <img class="sv-camera__poster sv-camera__poster--narrow"
+                        src="assets/camera/camera-poster-narrow.webp" width="1020" height="1020" alt=""
+                        aria-hidden="true" fetchpriority="high" decoding="sync">
                 </div>
                 <p id="sv-camera-status" class="sv-camera__status" role="status" hidden>Loading the camera…</p>
                 <noscript>
@@ -68,10 +69,11 @@
                 <span class="sv-camera__corner sv-camera__corner--br" aria-hidden="true"></span>
             </div>
             <div class="sv-camera__bottomline">
-                <p id="sv-camera-hint">Move your cursor. Find your angle.</p>
+                <p id="sv-camera-hint" hidden>Move your cursor. Find your angle.</p>
                 <div class="sv-camera__controls">
-                    <button type="button" id="sv-camera-centre" disabled>Centre camera</button>
-                    <button type="button" id="sv-camera-pause" aria-pressed="false" disabled>Pause tracking</button>
+                    <button type="button" id="sv-camera-centre" disabled hidden>Centre camera</button>
+                    <button type="button" id="sv-camera-pause" aria-pressed="false" disabled hidden>Pause
+                        tracking</button>
                 </div>
             </div>
             <p id="sv-camera-keyboard" class="sv-camera__sr-only">Use arrow keys to aim the camera. Press Home to centre
@@ -230,21 +232,15 @@
                 </div>
             </div>
             <div class="gallery-container">
-                <div class="gallery-card"><img
-                        src="https://images.unsplash.com/photo-1557597774-9d273605dfa9?auto=format&fit=crop&w=600&q=80"
-                        alt="CCTV Camera"></div>
-                <div class="gallery-card"><img
-                        src="https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&w=600&q=80"
-                        alt="Access Control"></div>
-                <div class="gallery-card center-card"><img
-                        src="https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=600&q=80"
-                        alt="Network Wiring"></div>
-                <div class="gallery-card"><img
-                        src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=600&q=80"
-                        alt="Control Room"></div>
-                <div class="gallery-card"><img
-                        src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80"
-                        alt="Server Rack"></div>
+                <div class="gallery-card"><img src="assets/gallery/images.jpg" alt="CCTV Camera"></div>
+                <div class="gallery-card"><img src="assets/gallery/Modern_Wall-Mounted_Alarm_Keypad.png"
+                        alt="Alarm Keypad"></div>
+                <div class="gallery-card center-card"><img src="assets/gallery/Organized_Home_Network_Rack.png"
+                        alt="Network Rack"></div>
+                <div class="gallery-card"><img src="assets/gallery/Tablet_Surveillance_Control_Desk.png"
+                        alt="Surveillance Tablet"></div>
+                <div class="gallery-card"><img src="assets/gallery/Infrared_Backyard_Security_Feed.png"
+                        alt="Night Vision Feed"></div>
             </div>
         </section>
 
