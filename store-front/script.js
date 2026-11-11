@@ -132,51 +132,77 @@ document.addEventListener("DOMContentLoaded", function () {
         glareObserver.observe(glareCard);
     }
 
-    // 4. Hero Plexus Interactive Background
+    // 4. Plexus background — particles live in PAGE coordinates, so they scroll with content
     const canvas = document.getElementById("plexus-canvas");
     if (canvas) {
         const ctx = canvas.getContext("2d");
-        let width = canvas.width = canvas.offsetWidth;
-        let height = canvas.height = canvas.offsetHeight;
+        const LINK_DIST = 120;
+        const DENSITY = 1 / 17000;   // particles per px² of page area
+        const MAX_PARTICLES = 220;
 
+        let width = 0, height = 0, worldHeight = 0;
         const particles = [];
-        const particleCount = Math.min(Math.floor(width / 15), 60);
 
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
+        function makeParticle(yMin, yMax) {
+            return {
                 x: Math.random() * width,
-                y: Math.random() * height,
+                y: yMin + Math.random() * (yMax - yMin),
                 vx: (Math.random() - 0.5) * 0.6,
                 vy: (Math.random() - 0.5) * 0.6,
                 radius: Math.random() * 2 + 1
+            };
+        }
+
+        function measure() {
+            width = canvas.width = canvas.offsetWidth;
+            height = canvas.height = canvas.offsetHeight;
+
+            const prevWorld = worldHeight;
+            worldHeight = document.documentElement.scrollHeight;
+
+            const target = Math.min(Math.floor(width * worldHeight * DENSITY), MAX_PARTICLES);
+            while (particles.length < target) particles.push(makeParticle(prevWorld, worldHeight));
+            if (particles.length > target) particles.length = target;
+
+            particles.forEach(p => {
+                p.x = Math.min(p.x, width);
+                p.y = Math.min(p.y, worldHeight);
             });
         }
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
+            const scrollY = window.scrollY;
+            const visible = [];
 
-            for (let i = 0; i < particles.length; i++) {
-                let p = particles[i];
+            for (const p of particles) {
                 p.x += p.vx;
                 p.y += p.vy;
-
                 if (p.x < 0 || p.x > width) p.vx *= -1;
-                if (p.y < 0 || p.y > height) p.vy *= -1;
+                if (p.y < 0 || p.y > worldHeight) p.vy *= -1;
 
+                const sy = p.y - scrollY;
+                if (sy > -LINK_DIST && sy < height + LINK_DIST) {
+                    visible.push({ x: p.x, y: sy, r: p.radius });
+                }
+            }
+
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = 'rgba(30, 41, 59, 0.12)';
+            ctx.lineWidth = 0.5;
+
+            for (let i = 0; i < visible.length; i++) {
+                const a = visible[i];
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#1e293b';
+                ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
                 ctx.fill();
 
-                for (let j = i + 1; j < particles.length; j++) {
-                    let p2 = particles[j];
-                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
-                    if (dist < 120) {
+                for (let j = i + 1; j < visible.length; j++) {
+                    const b = visible[j];
+                    if (Math.hypot(a.x - b.x, a.y - b.y) < LINK_DIST) {
                         ctx.beginPath();
-                        ctx.moveTo(p.x, p.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = 'rgba(30, 41, 59, 0.12)';
-                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
                         ctx.stroke();
                     }
                 }
@@ -184,12 +210,15 @@ document.addEventListener("DOMContentLoaded", function () {
             requestAnimationFrame(animate);
         }
 
+        measure();
         animate();
 
-        window.addEventListener("resize", () => {
-            width = canvas.width = canvas.offsetWidth;
-            height = canvas.height = canvas.offsetHeight;
-        });
+        // Re-measure on resize and whenever page height changes
+        // (services load in, reviews grid opens, etc.)
+        window.addEventListener("resize", measure);
+        if (typeof ResizeObserver !== "undefined") {
+            new ResizeObserver(measure).observe(document.body);
+        }
     }
 
     // 5. Services Carousel (Symmetrical Centering - Left & Right Cards)
