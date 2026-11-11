@@ -1166,31 +1166,30 @@ footer {
 }
 
 /* ==========================================================================
-   SECTION STANDARDIZATION — full-width glass bands, left-aligned headers
+   SECTION STANDARDIZATION — rounded grey glass sections, left-aligned headers
    ========================================================================== */
 
 :root {
-    /* left/right gutter that lines content up on a 1100px grid */
-    --gutter: max(1.5rem, calc((100vw - 1100px) / 2));
+    --gutter: max(1.5rem, calc((100vw - 2.5rem - 1100px) / 2));
 }
 
-/* Full-width translucent band */
+/* Rounded translucent grey section */
 .services,
 .booking-section,
 .gallery-section,
 .reviews-section,
 .about-section {
-    width: 100%;
+    width: calc(100% - 2.5rem);
     max-width: none;
-    margin: 0;
+    margin: 1.25rem auto;
     padding: clamp(3rem, 7vh, 4.5rem) var(--gutter);
     background: rgba(100, 116, 139, 0.10);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
-    border-top: 1px solid rgba(15, 23, 42, 0.07);
-    border-bottom: 1px solid rgba(15, 23, 42, 0.07);
-    border-radius: 0;
-    box-shadow: none;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 8px 30px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
 }
 
 /* Carousel and gallery run edge to edge; only their headers get the gutter */
@@ -1238,19 +1237,19 @@ footer {
     align-self: flex-end;
 }
 
-/* Red accent bar, left aligned */
+/* Red accent bar under every title */
 .section-header h2::after,
 .about-section h2::after {
     content: '';
     display: block;
-    width: 10vw;
+    width: 120px;
     height: 4px;
     margin: 0.85rem 0 0;
     background: var(--primary);
     border-radius: 2px;
 }
 
-/* Booking card fills the grid like every other section */
+/* Booking card fills the grid */
 .glare-card-wrapper {
     max-width: none;
     margin: 0;
@@ -1280,6 +1279,16 @@ footer {
 @media (max-width: 768px) {
     :root {
         --gutter: 1.25rem;
+    }
+
+    .services,
+    .booking-section,
+    .gallery-section,
+    .reviews-section,
+    .about-section {
+        width: calc(100% - 1.5rem);
+        margin: 0.75rem auto;
+        border-radius: 18px;
     }
 
     .section-header {
